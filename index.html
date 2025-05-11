@@ -24,11 +24,17 @@
     .dropdown {
       display: none; position: absolute; top: 60px; right: 20px;
       background: white; border: 1px solid #ccc; border-radius: 5px;
+      z-index: 100;
     }
     .dropdown a {
       display: block; padding: 10px; color: black; text-decoration: none;
     }
     .dropdown a:hover { background: #eee; }
+
+    /* CORREÇÃO: Estilo para mostrar o menu */
+    .dropdown.show {
+      display: block;
+    }
 
     .products {
       display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;
@@ -86,14 +92,20 @@
     function toggleMenu() {
       document.getElementById('menu').classList.toggle('show');
     }
+
     window.onclick = function(e) {
       if (!e.target.matches('.menu-btn')) {
         document.getElementById('menu').classList.remove('show');
       }
     }
 
-    function showModal() { document.getElementById('modal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function showModal() {
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
 
     function addItem() {
       const name = document.getElementById('itemName').value;
@@ -125,4 +137,27 @@
     }
 
     function filterItems() {
-      const query = document.getElementBy
+      const query = document.getElementById('search').value.toLowerCase();
+      const filtered = items.filter(item => item.name.toLowerCase().includes(query));
+      renderItems(filtered);
+    }
+
+    function renderItems(list = items) {
+      const container = document.getElementById('productList');
+      container.innerHTML = '';
+      list.forEach((item, index) => {
+        const el = document.createElement('div');
+        el.className = 'product';
+        el.style.backgroundColor = item.color;
+        el.innerHTML = `
+          <h4>${item.name}</h4>
+          <p>Preço: R$ ${item.price.toFixed(2)}</p>
+          <input type="number" value="${item.price}" onchange="updatePrice(${index}, this.value)">
+          <button onclick="deleteItem(${index})">Excluir</button>
+        `;
+        container.appendChild(el);
+      });
+    }
+  </script>
+</body>
+</html>
