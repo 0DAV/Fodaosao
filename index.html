@@ -31,7 +31,6 @@
     }
     .dropdown a:hover { background: #eee; }
 
-    /* CORREÇÃO: Estilo para mostrar o menu */
     .dropdown.show {
       display: block;
     }
@@ -63,7 +62,7 @@
 <body>
   <header>
     <h1>SACOLÃO IRMÃOS ROCHA</h1>
-    <button class="menu-btn" onclick="toggleMenu()">&#9776;</button>
+    <button class="menu-btn" onclick="toggleMenu(event)">&#9776;</button>
     <div class="dropdown" id="menu">
       <a href="#" onclick="showModal()">Adicionar novo item</a>
       <a href="#" onclick="sortItems()">Organizar em ordem alfabética</a>
@@ -89,14 +88,28 @@
   <script>
     let items = [];
 
-    function toggleMenu() {
-      document.getElementById('menu').classList.toggle('show');
+    // Carrega os itens salvos ao iniciar
+    window.onload = () => {
+      const saved = localStorage.getItem('items');
+      if (saved) {
+        items = JSON.parse(saved);
+        renderItems();
+      }
     }
 
-    window.onclick = function(e) {
-      if (!e.target.matches('.menu-btn')) {
-        document.getElementById('menu').classList.remove('show');
+    // Fecha o menu só se clicar fora dele e do botão
+    window.addEventListener('click', function(e) {
+      const menu = document.getElementById('menu');
+      const button = document.querySelector('.menu-btn');
+      if (!menu.contains(e.target) && !button.contains(e.target)) {
+        menu.classList.remove('show');
       }
+    });
+
+    function toggleMenu(event) {
+      event.stopPropagation(); // Impede que o clique feche o menu
+      const menu = document.getElementById('menu');
+      menu.classList.toggle('show');
     }
 
     function showModal() {
@@ -113,6 +126,7 @@
       const color = document.getElementById('itemColor').value;
       if (name && !isNaN(price)) {
         items.push({ name, price, color });
+        saveItems();
         closeModal();
         renderItems();
       }
@@ -120,6 +134,7 @@
 
     function deleteItem(index) {
       items.splice(index, 1);
+      saveItems();
       renderItems();
     }
 
@@ -127,12 +142,14 @@
       const price = parseFloat(value);
       if (!isNaN(price)) {
         items[index].price = price;
+        saveItems();
         renderItems();
       }
     }
 
     function sortItems() {
       items.sort((a, b) => a.name.localeCompare(b.name));
+      saveItems();
       renderItems();
     }
 
@@ -157,6 +174,10 @@
         `;
         container.appendChild(el);
       });
+    }
+
+    function saveItems() {
+      localStorage.setItem('items', JSON.stringify(items));
     }
   </script>
 </body>
