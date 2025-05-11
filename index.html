@@ -1,8 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SACOLÃO IRMÃOS ROCHA</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,10 +31,7 @@
       display: block; padding: 10px; color: black; text-decoration: none;
     }
     .dropdown a:hover { background: #eee; }
-
-    .dropdown.show {
-      display: block;
-    }
+    .dropdown.show { display: block; }
 
     .products {
       display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;
@@ -57,6 +54,14 @@
     }
     .modal-content input {
       width: 100%; padding: 8px; margin: 5px 0;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 18px; }
+      .search-bar input { width: 90%; }
+      .product { width: 100%; }
+      .modal-content { width: 90%; }
+      .menu-btn { font-size: 20px; }
     }
   </style>
 </head>
@@ -89,21 +94,35 @@
   <script>
     let items = [];
 
-    // Carregar os itens salvos do localStorage ao iniciar
     window.onload = () => {
-      const saved = localStorage.getItem('items');
-      if (saved) {
-        items = JSON.parse(saved);
-        renderItems();
-      }
+      fetch('items.json')
+        .then(res => res.json())
+        .then(data => {
+          items = data;
+          renderItems();
+        })
+        .catch(() => {
+          const saved = localStorage.getItem('items');
+          if (saved) {
+            items = JSON.parse(saved);
+            renderItems();
+          }
+        });
     }
 
-    // Salvar os itens no localStorage
     function saveItems() {
       localStorage.setItem('items', JSON.stringify(items));
+      syncWithServer();
     }
 
-    // Toggle do menu dropdown com proteção contra clique fora
+    function syncWithServer() {
+      fetch('save_items.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(items)
+      });
+    }
+
     function toggleMenu(event) {
       event.stopPropagation();
       document.getElementById('menu').classList.toggle('show');
