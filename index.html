@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -88,7 +89,7 @@
   <script>
     let items = [];
 
-    // Carrega os itens salvos ao iniciar
+    // Carregar os itens salvos do localStorage ao iniciar
     window.onload = () => {
       const saved = localStorage.getItem('items');
       if (saved) {
@@ -97,7 +98,17 @@
       }
     }
 
-    // Fecha o menu só se clicar fora dele e do botão
+    // Salvar os itens no localStorage
+    function saveItems() {
+      localStorage.setItem('items', JSON.stringify(items));
+    }
+
+    // Toggle do menu dropdown com proteção contra clique fora
+    function toggleMenu(event) {
+      event.stopPropagation();
+      document.getElementById('menu').classList.toggle('show');
+    }
+
     window.addEventListener('click', function(e) {
       const menu = document.getElementById('menu');
       const button = document.querySelector('.menu-btn');
@@ -105,12 +116,6 @@
         menu.classList.remove('show');
       }
     });
-
-    function toggleMenu(event) {
-      event.stopPropagation(); // Impede que o clique feche o menu
-      const menu = document.getElementById('menu');
-      menu.classList.toggle('show');
-    }
 
     function showModal() {
       document.getElementById('modal').style.display = 'flex';
@@ -174,10 +179,6 @@
         `;
         container.appendChild(el);
       });
-    }
-
-    function saveItems() {
-      localStorage.setItem('items', JSON.stringify(items));
     }
   </script>
 </body>
